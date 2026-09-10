@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07070b;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.12);--text:#fff;--muted:#a5a5b5;--accent:#9b5cff;--accent2:#5de7ff}
+body{min-height:100vh;background:radial-gradient(circle at 20% 10%,rgba(155,92,255,.18),transparent 30%),radial-gradient(circle at 80% 80%,rgba(93,231,255,.10),transparent 28%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(to bottom,black,transparent)}
+.top{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:relative;z-index:5}
+.brand{font-size:18px;font-weight:800;letter-spacing:.4px}.brand span{color:var(--accent2)}
+.settings{width:40px;height:40px;border:1px solid var(--line);background:var(--card);border-radius:13px;color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(14px);font-size:19px;transition:.25s}
+.settings:hover{transform:rotate(25deg);border-color:rgba(155,92,255,.7);box-shadow:0 0 25px rgba(155,92,255,.2)}
+.hero{max-width:1050px;margin:0 auto;padding:30px 18px 0;text-align:center}
+.eyebrow{color:var(--accent2);font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:13px}
+h1{font-size:clamp(30px,6vw,58px);line-height:1.03;letter-spacing:-2px;margin-bottom:12px}
+.sub{color:var(--muted);font-size:14px;max-width:550px;margin:auto;line-height:1.7}
+.viewer{max-width:950px;margin:32px auto 0;padding:0 16px}
+.stage{height:min(68vh,650px);min-height:350px;border:1px solid var(--line);border-radius:28px;background:rgba(255,255,255,.035);box-shadow:0 30px 100px rgba(0,0,0,.45),inset 0 1px rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.stage img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .35s,transform .45s}
+.empty{color:var(--muted);text-align:center;padding:40px}.empty .big{font-size:55px;margin-bottom:12px}
+.controls{display:flex;align-items:center;justify-content:center;gap:12px;margin:17px 0 8px}
+.ctrl{width:45px;height:45px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:#fff;cursor:pointer;font-size:20px;backdrop-filter:blur(12px)}
+.ctrl:hover{border-color:var(--accent);box-shadow:0 0 22px rgba(155,92,255,.22)}
+.counter{min-width:105px;text-align:center;color:#ddd;font-size:13px;font-weight:600}
+.progress{max-width:420px;height:3px;margin:0 auto;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.35s}
+footer{text-align:center;padding:52px 20px 28px;color:var(--muted);font-size:12px}
+.insta{width:44px;height:44px;border:1px solid var(--line);border-radius:50%;display:inline-grid;place-items:center;text-decoration:none;margin-bottom:9px;background:var(--card);box-shadow:0 8px 24px rgba(0,0,0,.25);transition:.25s}.insta svg{width:25px;height:25px;display:block}.insta:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 24px rgba(214,41,118,.25)}
+.dev{display:block;color:#777;font-size:10px;letter-spacing:2px;text-transform:uppercase}.copyright{margin-top:12px;color:#777;font-size:11px;letter-spacing:.4px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);display:none;place-items:center;z-index:20;padding:20px}
+.modal.show{display:grid}
+.box{width:min(390px,100%);border:1px solid var(--line);background:#111117;border-radius:22px;padding:26px;box-shadow:0 25px 100px rgba(0,0,0,.6)}
+.box h2{font-size:21px;margin-bottom:8px}.box p{font-size:12px;color:var(--muted);margin-bottom:20px}
+.input{width:100%;height:48px;border-radius:12px;border:1px solid var(--line);background:#09090d;color:#fff;padding:0 14px;outline:none}
+.input:focus{border-color:var(--accent)}
+.actions{display:flex;gap:9px;margin-top:12px}.btn{flex:1;height:45px;border:0;border-radius:12px;font-weight:700;cursor:pointer}.primary{background:linear-gradient(135deg,var(--accent),#7141d9);color:#fff}.cancel{background:#1b1b22;color:#bbb}
+.nojs{display:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">ROCKY<span>GALLERY</span></div>
+  <button class="settings" aria-label="Admin settings" onclick="openModal()">⚙</button>
+</header>
+
+<main>
+<section class="hero">
+  <div class="eyebrow">Private Gallery</div>
+  <h1>Moments, one by one.</h1>
+  <p class="sub">A clean, immersive photo experience. Photos are presented individually with smooth transitions.</p>
+</section>
+
+<section class="viewer">
+  <div class="stage" id="stage">
+    {% if photos %}
+      <img id="photo" src="{{ photos[0] }}" alt="Gallery photo">
+    {% else %}
+      <div class="empty"><div class="big">✦</div><div>No photos have been added yet.</div></div>
+    {% endif %}
+  </div>
+  {% if photos %}
+  <div class="controls">
+    <button class="ctrl" onclick="prev()">‹</button>
+    <div class="counter" id="counter">01 / {{ photos|length }}</div>
+    <button class="ctrl" onclick="next()">›</button>
+  </div>
+  <div class="progress"><i id="bar"></i></div>
+  {% endif %}
+</section>
+</main>
+
+<footer>
+  <a class="insta" href="https://www.instagram.com/it.s_2223?igsi=MW0zNDRtamFza2lncA==" target="_blank" rel="noopener" aria-label="Developer Instagram">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="igGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#feda75"/>
+          <stop offset="35%" stop-color="#fa7e1e"/>
+          <stop offset="65%" stop-color="#d62976"/>
+          <stop offset="100%" stop-color="#4f5bd5"/>
+        </linearGradient>
+      </defs>
+      <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="url(#igGradient)" stroke-width="2.2"/>
+      <circle cx="12" cy="12" r="4.2" fill="none" stroke="url(#igGradient)" stroke-width="2.2"/>
+      <circle cx="17.4" cy="6.7" r="1.2" fill="url(#igGradient)"/>
+    </svg>
+  </a>
+  <span class="dev">Developer</span>
+  <div class="copyright">© 2026 ROCKY GALLERY • All Rights Reserved<br>
+Designed & Developed by 𝗦𝗔𝗥𝗢𝗝</div>
+</footer>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="box">
+    <h2>Admin Access</h2>
+    <p>Enter the admin password to open the photo management panel.</p>
+    <form method="POST" action="{{ url_for('admin_login') }}">
+      <input class="input" type="password" name="password" placeholder="Admin password" autocomplete="current-password" required>
+      <div class="actions">
+        <button type="button" class="btn cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn primary" type="submit">Open Panel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const photos = {{ photos|tojson }};
+let index = 0;
+const img = document.getElementById('photo');
+const counter = document.getElementById('counter');
+const bar = document.getElementById('bar');
+function render(){
+  if(!img || !photos.length) return;
+  img.style.opacity='0';
+  img.style.transform='scale(.985)';
+  setTimeout(()=>{
+    img.src=photos[index];
+    counter.textContent=String(index+1).padStart(2,'0')+' / '+String(photos.length).padStart(2,'0');
+    bar.style.width=((index+1)/photos.length*100)+'%';
+    img.onload=()=>{img.style.opacity='1';img.style.transform='scale(1)'};
+  },130);
+}
+function next(){if(!photos.length)return;index=(index+1)%photos.length;render()}
+function prev(){if(!photos.length)return;index=(index-1+photos.length)%photos.length;render()}
+if(photos.length) {bar.style.width=(1/photos.length*100)+'%';}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev();if(e.key==='Escape')closeModal()});
+let timer = photos.length > 1 ? setInterval(next, 5000) : null;
+const modal=document.getElementById('modal');
+function openModal(){modal.classList.add('show');setTimeout(()=>modal.querySelector('input').focus(),80)}
+function closeModal(){modal.classList.remove('show')}
+</script>
+</body>
+</html>
